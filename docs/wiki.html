@@ -1,0 +1,524 @@
+<title>Dispositifs d'écoute &amp; soutien RH — OCTO</title>
+<style>
+  :root {
+    --bg: #f4f6f9;
+    --surface: #ffffff;
+    --surface-2: #e7e9ee;
+    --ink: #0e2356;
+    --ink-soft: #586586;
+    --ink-faint: #9fa7bb;
+    --line: #cfd3dd;
+    --line-soft: #e7e9ee;
+    --accent: #00a8b3;
+    --accent-soft: #e0fbfc;
+    --accent-ink: #0e2356;
+    --confirmed: #1e6b34;
+    --confirmed-soft: #e3f3e6;
+    --deduit: #7a4fb5;
+    --deduit-soft: #f1e9fb;
+    --incertain: #a6650f;
+    --incertain-soft: #fbeedd;
+    --danger: #b3261e;
+    --danger-soft: #fbe3e0;
+    --font-display: "Segoe UI Semibold", "Segoe UI", system-ui, -apple-system, sans-serif;
+    --font-body: "Segoe UI", system-ui, -apple-system, sans-serif;
+    --font-mono: "Cascadia Code", "Consolas", ui-monospace, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0a1226;
+      --surface: #111c38;
+      --surface-2: #16244a;
+      --ink: #eef1f8;
+      --ink-soft: #a7b3d1;
+      --ink-faint: #6b7aa3;
+      --line: #26355f;
+      --line-soft: #1b2947;
+      --accent: #29e3ee;
+      --accent-soft: #0f3438;
+      --accent-ink: #06333a;
+      --confirmed: #6fd08a;
+      --confirmed-soft: #123422;
+      --deduit: #c3a3ee;
+      --deduit-soft: #2a2044;
+      --incertain: #f0b768;
+      --incertain-soft: #3a2a10;
+      --danger: #f08a80;
+      --danger-soft: #3a1512;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0a1226; --surface: #111c38; --surface-2: #16244a;
+    --ink: #eef1f8; --ink-soft: #a7b3d1; --ink-faint: #6b7aa3;
+    --line: #26355f; --line-soft: #1b2947;
+    --accent: #29e3ee; --accent-soft: #0f3438; --accent-ink: #06333a;
+    --confirmed: #6fd08a; --confirmed-soft: #123422;
+    --deduit: #c3a3ee; --deduit-soft: #2a2044;
+    --incertain: #f0b768; --incertain-soft: #3a2a10;
+    --danger: #f08a80; --danger-soft: #3a1512;
+  }
+  :root[data-theme="light"] {
+    --bg: #f4f6f9; --surface: #ffffff; --surface-2: #e7e9ee;
+    --ink: #0e2356; --ink-soft: #586586; --ink-faint: #9fa7bb;
+    --line: #cfd3dd; --line-soft: #e7e9ee;
+    --accent: #00a8b3; --accent-soft: #e0fbfc; --accent-ink: #0e2356;
+    --confirmed: #1e6b34; --confirmed-soft: #e3f3e6;
+    --deduit: #7a4fb5; --deduit-soft: #f1e9fb;
+    --incertain: #a6650f; --incertain-soft: #fbeedd;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: var(--font-body); line-height: 1.55; font-size: 15.5px;
+  }
+  .layout { display: grid; grid-template-columns: 250px minmax(0, 1fr); min-height: 100vh; }
+  @media (max-width: 860px) { .layout { grid-template-columns: 1fr; } .sidebar { position: static; } }
+
+  .sidebar {
+    position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto;
+    background: var(--surface); border-right: 1px solid var(--line-soft);
+    padding: 1.75rem 1.25rem;
+  }
+  .sidebar-brand { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.75rem; }
+  .sidebar-brand .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); flex: none; }
+  .sidebar-brand strong {
+    font-family: var(--font-display); font-size: 0.95rem; letter-spacing: 0.02em;
+  }
+  .toc-group { margin-bottom: 1.5rem; }
+  .toc-group h3 {
+    font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.09em;
+    color: var(--ink-faint); margin: 0 0 0.5rem; font-weight: 700;
+  }
+  .toc-link {
+    display: block; padding: 0.32rem 0.5rem; border-radius: 6px; color: var(--ink-soft);
+    text-decoration: none; font-size: 0.88rem;
+  }
+  .toc-link:hover { background: var(--surface-2); color: var(--ink); }
+
+  main { padding: 2.75rem clamp(1.25rem, 5vw, 4rem) 6rem; max-width: 880px; }
+  .eyebrow {
+    font-family: var(--font-display); text-transform: uppercase; letter-spacing: 0.12em;
+    font-size: 0.72rem; color: var(--accent); margin: 0 0 0.6rem;
+  }
+  h1 {
+    font-family: var(--font-display); font-size: clamp(1.7rem, 3.4vw, 2.3rem);
+    letter-spacing: -0.01em; margin: 0 0 0.5rem; text-wrap: balance;
+  }
+  .lede { color: var(--ink-soft); max-width: 62ch; margin: 0 0 2.5rem; font-size: 1.02rem; }
+  h2 {
+    font-family: var(--font-display); font-size: 1.32rem; margin: 3rem 0 0.35rem;
+    padding-top: 1.5rem; border-top: 1px solid var(--line-soft);
+  }
+  h2:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
+  h2 .n { color: var(--accent); font-variant-numeric: tabular-nums; margin-right: 0.5rem; }
+  .section-sub { color: var(--ink-soft); margin: 0 0 1.1rem; max-width: 64ch; }
+
+  .fact {
+    border-left: 3px solid var(--line); background: var(--surface); border-radius: 0 8px 8px 0;
+    padding: 0.7rem 1rem; margin: 0.7rem 0; font-size: 0.95rem;
+  }
+  .fact.accent { border-left-color: var(--accent); }
+  .fact-label {
+    display: block; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--ink-faint); margin-bottom: 0.2rem; font-weight: 700;
+  }
+  .tag {
+    display: inline-block; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.03em;
+    padding: 0.1rem 0.45rem; border-radius: 999px; margin-left: 0.35rem; vertical-align: 1px;
+  }
+  .tag-confirme { background: var(--confirmed-soft); color: var(--confirmed); }
+  .tag-deduit { background: var(--deduit-soft); color: var(--deduit); }
+  .src { color: var(--ink-faint); font-size: 0.82rem; }
+
+  .verdict {
+    display: inline-block; font-family: var(--font-display); font-size: 0.7rem;
+    font-weight: 700; letter-spacing: 0.04em; padding: 0.12rem 0.5rem; border-radius: 5px;
+  }
+  .verdict-garder { background: var(--confirmed-soft); color: var(--confirmed); }
+  .verdict-modifier { background: var(--incertain-soft); color: var(--incertain); }
+  .verdict-supprimer { background: var(--danger-soft); color: var(--danger); }
+  .sev {
+    display: inline-block; font-size: 0.66rem; font-weight: 700; letter-spacing: 0.03em;
+    padding: 0.1rem 0.45rem; border-radius: 999px; white-space: nowrap;
+  }
+  .sev-major { background: var(--danger-soft); color: var(--danger); }
+  .sev-minor { background: var(--incertain-soft); color: var(--incertain); }
+
+  .protocol {
+    background: var(--surface); border: 1px solid var(--line-soft); border-radius: 10px;
+    padding: 1rem 1.1rem; margin: 1rem 0 1.4rem;
+  }
+  .protocol-label {
+    font-family: var(--font-display); font-size: 0.72rem; text-transform: uppercase;
+    letter-spacing: 0.09em; color: var(--accent-ink); background: var(--accent-soft);
+    display: inline-block; padding: 0.15rem 0.55rem; border-radius: 5px; margin-bottom: 0.65rem;
+  }
+  .protocol ol { margin: 0; padding-left: 1.15rem; }
+  .protocol li { margin: 0.28rem 0; }
+  .protocol code { font-family: var(--font-mono); font-size: 0.87em; background: var(--surface-2); padding: 0.05rem 0.35rem; border-radius: 4px; }
+
+  .table-wrap { overflow-x: auto; margin: 1rem 0 1.6rem; border: 1px solid var(--line-soft); border-radius: 10px; }
+  table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+  th, td { text-align: left; padding: 0.6rem 0.8rem; border-bottom: 1px solid var(--line-soft); vertical-align: top; }
+  thead th {
+    background: var(--surface-2); font-family: var(--font-display); font-size: 0.72rem;
+    text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-soft);
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: var(--surface-2); }
+
+  .not-list { list-style: none; margin: 0.8rem 0; padding: 0; display: grid; gap: 0.4rem; }
+  .not-list li { display: flex; gap: 0.5rem; align-items: baseline; color: var(--ink-soft); font-size: 0.93rem; }
+  .not-list b { color: var(--ink); }
+
+  footer.wiki-footer {
+    margin-top: 3.5rem; padding-top: 1.25rem; border-top: 1px solid var(--line-soft);
+    color: var(--ink-faint); font-size: 0.82rem;
+  }
+  a { color: var(--accent-ink); }
+  :root[data-theme="dark"] a, @media (prefers-color-scheme: dark) { }
+  a:focus-visible, .toc-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .sub-h3 { font-family: var(--font-display); font-size: 1.02rem; margin: 1.4rem 0 0.2rem; }
+</style>
+
+<div class="layout">
+  <nav class="sidebar" aria-label="Sommaire">
+    <div class="sidebar-brand"><span class="dot"></span><strong>DISPOSITIFS D'ÉCOUTE RH</strong></div>
+    <div class="toc-group">
+      <h3>Vue d'ensemble</h3>
+      <a class="toc-link" href="#overview">Pourquoi ce wiki</a>
+      <a class="toc-link" href="#comparatif">Comparatif rapide</a>
+    </div>
+    <div class="toc-group">
+      <h3>Dispositifs existants</h3>
+      <a class="toc-link" href="#stress">1 · Plan stress OCTO</a>
+      <a class="toc-link" href="#coaching">2 · Coaching professionnel</a>
+      <a class="toc-link" href="#ressource">3 · Personne ressource</a>
+    </div>
+    <div class="toc-group">
+      <h3>Et le chantier P&amp;D ?</h3>
+      <a class="toc-link" href="#redondance">Challenge de redondance</a>
+      <a class="toc-link" href="#clarifications">Clarifications &amp; arbitrages</a>
+      <a class="toc-link" href="#incoherences">Incohérences du PPT</a>
+    </div>
+  </nav>
+
+  <main>
+    <p class="eyebrow" id="overview">Wiki RH — OCTO</p>
+    <h1>Dispositifs d'écoute et de soutien RH déjà en place</h1>
+    <p class="lede">
+      Synthèse de 3 documents RH internes (stress au travail, coaching
+      professionnel, personnes ressources) avant l'examen du chantier
+      <em>« Dispositif d'écoute OHC chez P&amp;D »</em> (02.07.2026), qui propose
+      de nouveaux formats d'écoute pour l'atelier Product&nbsp;&amp;&nbsp;Design.
+      Chaque affirmation porte un tag de confiance
+      <span class="tag tag-confirme">CONFIRMÉ</span> (sourcée dans un des 3 PDF)
+      ou <span class="tag tag-deduit">DÉDUIT</span> (recoupement entre sources).
+    </p>
+
+    <h2 id="comparatif"><span class="n">·</span>Comparatif rapide</h2>
+    <p class="section-sub">Les 3 dispositifs répondent à des besoins différents — aucun ne remplace les 2 autres.</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Dispositif</th><th>Pour quoi</th><th>Qui</th><th>Format</th><th>Comment déclencher</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>Plan stress</b> — espace neutre</td>
+            <td>Stress, mal-être</td>
+            <td>Coach externe certifié</td>
+            <td>1 à 3 séances, 1h30 max</td>
+            <td><code>espaceocto@gmail.com</code></td>
+          </tr>
+          <tr>
+            <td><b>Coaching pro</b></td>
+            <td>Objectif professionnel précis (affirmation, posture, confiance…)</td>
+            <td>Coach interne ou externe</td>
+            <td>6 à 8 séances, 1h–2h</td>
+            <td>Demande à sa lead RH</td>
+          </tr>
+          <tr>
+            <td><b>Personne ressource</b></td>
+            <td>Situation vécue liée à la diversité, besoin d'une oreille</td>
+            <td>Octo volontaire, formé·e à l'écoute active</td>
+            <td>Ponctuel, jamais régulier</td>
+            <td>Contact direct (liste publiée)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="stress"><span class="n">1</span>Plan stress OCTO</h2>
+    <p class="section-sub">Issu d'un audit ISIS Talent mené au printemps 2016.</p>
+
+    <div class="fact accent">
+      7 Octos en stress intense identifiés sur 18 mois ont déclenché l'audit — aucun n'était en burn-out.
+      <span class="tag tag-confirme">CONFIRMÉ</span>
+      <div class="src">RH — C'est quoi le stress au travail, p.5</div>
+    </div>
+    <div class="fact">
+      3 causes principales : <b>organisation</b> (stratégie mal connue, fossé IA/consultants),
+      <b>management</b> (objectifs flous, manque de soutien hiérarchique),
+      <b>communication</b> (peu efficace dans les deux sens, alertes insuffisamment prises en compte).
+      <span class="tag tag-confirme">CONFIRMÉ</span>
+      <div class="src">RH — C'est quoi le stress au travail, p.5-6</div>
+    </div>
+    <div class="fact">
+      Plan d'action à 2 niveaux : <b>collectif</b> (informer/former, détecter via O3 bimensuels + signaux
+      faibles — THI, arrêts maladie —, accompagner via suivi RH et BFM) et <b>individuel</b> (boîte à
+      outils, espace de discussion neutre).
+      <span class="tag tag-confirme">CONFIRMÉ</span>
+      <div class="src">RH — C'est quoi le stress au travail, p.6-9</div>
+    </div>
+    <div class="fact accent">
+      Volet <b>« @OCTO / Zen@octo »</b> de l'accompagnement collectif — contient <b>déjà, dès 2016</b>,
+      des formats collectifs entre pairs : <b>ateliers Zen@octo</b>, <b>résolution de problèmes entre
+      pairs (« clinique »)</b>, <b>groupe de parole empathique</b>, en plus de l'espace de discussion
+      neutre. Ces formats sont le cœur du <a href="#redondance">challenge de redondance</a> du chantier
+      P&amp;D : le vocabulaire (« clinique », « espace de parole ») y est réutilisé tel quel.
+      <span class="tag tag-confirme">CONFIRMÉ</span>
+      <div class="src">RH — C'est quoi le stress au travail, p.2 (schéma « plan d'action OCTO »)</div>
+    </div>
+
+    <div class="protocol">
+      <span class="protocol-label">Protocole — espace de discussion neutre</span>
+      <ol>
+        <li>Contacter <code>espaceocto@gmail.com</code></li>
+        <li>Le coach rappelle sous <b>2 jours ouvrés</b> pour valider la pertinence</li>
+        <li>RDV fixé sous <b>5 jours ouvrés</b></li>
+        <li>1 à 3 séances courtes (<b>1h30 maxi</b>)</li>
+        <li>Confidentialité stricte — remontée DRH uniquement si risque identifié, l'Octo étant prévenu au préalable</li>
+      </ol>
+    </div>
+    <p class="fact">
+      Principe transversal : <em>« Alerter, c'est protéger, pas dénoncer »</em> — devoir moral et juridique
+      d'agir si on identifie une situation à risque chez un pair.
+      <span class="tag tag-confirme">CONFIRMÉ</span>
+      <div class="src">RH — C'est quoi le stress au travail, p.9</div>
+    </p>
+
+    <h2 id="coaching"><span class="n">2</span>Coaching professionnel (interne/externe)</h2>
+    <p class="section-sub">Accompagnement individuel limité dans le temps, orienté objectif.</p>
+
+    <ul class="not-list">
+      <li><b>≠ mentorat</b> — pas d'expertise métier transmise sur le fond</li>
+      <li><b>≠ thérapie</b> — centré sur le présent et le futur, pas le passé</li>
+    </ul>
+    <div class="fact">
+      Thématiques les plus fréquentes : gestion des émotions, confiance en soi, posture et rôle,
+      adéquation valeurs Octo/personnelles.
+      <span class="tag tag-confirme">CONFIRMÉ</span>
+      <div class="src">RH — Le coaching professionnel, p.3</div>
+    </div>
+
+    <div class="protocol">
+      <span class="protocol-label">Protocole — 5 phases</span>
+      <ol>
+        <li>Demande auprès de la lead RH (ou proposée par le manager / la lead RH)</li>
+        <li>Qualification du besoin (coaching / mentoring / formation)</li>
+        <li>Orientation interne (pool de coachs Octo, besoin présenté anonymement) ou externe (relais RH centrale)</li>
+        <li>Lancement — cadrage tripartite avec le manager si besoin, contrat de coaching</li>
+        <li>6 à 8 séances individuelles (1h–2h, rythme 2-3 semaines) puis bilan</li>
+      </ol>
+    </div>
+    <div class="fact">
+      Confidentialité stricte : rien ne filtre côté coach, y compris vers manager et RH.
+      <span class="tag tag-confirme">CONFIRMÉ</span>
+      <div class="src">RH — Le coaching professionnel, p.5</div>
+    </div>
+
+    <h2 id="ressource"><span class="n">3</span>Personne ressource</h2>
+    <p class="section-sub">Relais de proximité identifié et identifiable, sur les sujets diversité.</p>
+
+    <div class="fact accent">
+      Écoute active sur les sujets diversité en entreprise (gender mix, LGBTQIA+, mixité sociale…) —
+      distincte du·de la référent·e (rôle officiel) et du role model (pas de mission officielle).
+      <span class="tag tag-confirme">CONFIRMÉ</span>
+      <div class="src">RH — Personne ressource, p.1-2</div>
+    </div>
+    <ul class="not-list">
+      <li><b>≠ psy</b> — le contact doit rester ponctuel, jamais régulier</li>
+      <li><b>≠ coach</b> — identifie des solutions plutôt que de les faire trouver par l'écouté·e</li>
+      <li><b>≠ médiateur</b> — aiguille vers un·e facilitateur·rice si besoin</li>
+      <li><b>≠ role model</b> — rôle distinct, même si cumulable</li>
+    </ul>
+
+    <div class="protocol">
+      <span class="protocol-label">Protocole — contact direct</span>
+      <ol>
+        <li>5 personnes identifiées en 2026 (Cloud &amp; Platform Engineering, Mairie RSE, Software Engineering, Campus OCAC, Product &amp; Design)</li>
+        <li>Contact via MM, mail ou téléphone — liste publiée</li>
+        <li>Échange ponctuel et confidentiel</li>
+        <li>Réorientation vers le·la référent·e ou un·e interlocuteur·rice RH si le contact devient régulier</li>
+      </ol>
+    </div>
+
+    <h2 id="redondance"><span class="n">·</span>Challenge de redondance — que garder des 4 formats&nbsp;P&amp;D&nbsp;?</h2>
+    <p class="section-sub">
+      Le chantier <em>« Dispositif d'écoute OHC chez P&amp;D »</em> propose 4 nouveaux formats.
+      Vue OCTO consultant (hors managers) : confrontés aux dispositifs existants,
+      <b>3 des 4 réactivent le volet « Zen@octo » du plan stress 2016</b> — un seul est réellement
+      nouveau. <span class="tag tag-deduit">DÉDUIT</span>
+    </p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Format P&amp;D</th><th>Correspondance existante</th><th>Verdict</th><th>Détail</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>Cercle d'écoute mensuel</b></td>
+            <td>= Groupe de parole empathique (Zen@octo, 2016)</td>
+            <td><span class="verdict verdict-modifier">MODIFIER</span></td>
+            <td>Élaguer « Café sans solution » (doublon) ; garder les 2 méthodes d'animation (mise en besoins, préparation d'une conversation).</td>
+          </tr>
+          <tr>
+            <td><b>Permanence individuelle</b></td>
+            <td>= Espace de discussion neutre existant (coach <b>externe</b>)</td>
+            <td><span class="verdict verdict-supprimer">SUPPRIMER</span></td>
+            <td>Recréer avec des coachs internes P&amp;D = perte de neutralité et d'anonymat.</td>
+          </tr>
+          <tr>
+            <td><b>Clinique mission complexe</b></td>
+            <td>= Résolution de problèmes entre pairs « clinique » (2016)</td>
+            <td><span class="verdict verdict-modifier">MODIFIER</span></td>
+            <td>Réactiver ; le process en 6 étapes + garde-fous (pas de tribunal, pas d'escalade déguisée) sont, eux, à garder.</td>
+          </tr>
+          <tr>
+            <td><b>Mentoring mission complexe</b></td>
+            <td>Aucun équivalent — ni coaching, ni espace neutre, ni personne ressource ne fait du mentorat</td>
+            <td><span class="verdict verdict-garder">GARDER</span></td>
+            <td>Seule vraie nouveauté du chantier.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="fact accent">
+      <b>Bilan</b> : 1 vraie nouveauté (mentorat) + 2 améliorations d'exécution (process clinique,
+      boîte à outils du cercle). Les dispositifs existent depuis 2016 — priorité :
+      <b>réactiver et rendre visible, pas recréer</b>.
+    </p>
+
+    <h2 id="clarifications"><span class="n">·</span>Clarifications &amp; arbitrages</h2>
+    <p class="section-sub">
+      Décisions proposées suite au brainstorm, à valider par le board P&amp;D
+      avant le pilote de septembre 2026.
+      <span class="tag tag-deduit">DÉDUIT</span>
+    </p>
+
+    <h3 class="sub-h3">Écoute individuelle, avant le pilote</h3>
+    <div class="protocol">
+      <ol>
+        <li><b>Permanence P&amp;D vs espace neutre</b> — des coachs internes à l'atelier
+          peuvent manquer de neutralité sur des sujets touchant le leadership P&amp;D
+          lui-même. <u>Décision</u> : rediriger vers l'espace de discussion neutre externe
+          (<code>espaceocto@gmail.com</code>) pour tout sujet touchant la confiance envers le
+          management/l'atelier ; la permanence P&amp;D reste réservée aux sujets de contexte
+          métier ou de mission.</li>
+        <li><b>Vocabulaire « coach P&amp;D »</b> — ce mot porte la déontologie stricte du
+          coaching pro OCTO, que les animateurs P&amp;D n'ont pas nécessairement.
+          <u>Décision</u> : renommer en « facilitateur·rice d'écoute P&amp;D », ou exiger le
+          même socle de formation à l'écoute active que les personnes ressources.</li>
+        <li><b>Un 3<sup>e</sup> pool de volontaires ?</b> — les coachs/mentors P&amp;D restent
+          à recruter alors qu'un réseau personne ressource et un pool coaching interne
+          existent déjà à l'échelle OCTO. <u>Décision</u> : solliciter d'abord ces réseaux ;
+          ne recruter un pool dédié que pour la part non couverte (ex. clinique mission
+          complexe).</li>
+      </ol>
+    </div>
+
+    <h3 class="sub-h3">Priorités et séquencement</h3>
+    <div class="protocol">
+      <ol>
+        <li><b>Mission toxique</b> — aucun équivalent dans les 3 dispositifs existants :
+          seule brique réellement nouvelle et nécessaire. <u>Décision</u> : confirmer la top
+          priorité (déjà « TOP PRIO » dans la matrice d'impact du chantier) ; formaliser le
+          process signalement → arbitrage → retrait avant tout le reste.</li>
+        <li><b>Clinique mission complexe</b> — renvoie explicitement vers « le bon
+          dispositif » en cas d'alerte, qui n'existe pas encore. <u>Décision</u> : ne pas
+          ouvrir la clinique avant qu'un point de contact d'alerte provisoire (escalade
+          manuelle coach → lead RH) soit fonctionnel.</li>
+        <li><b>Soutien managérial</b> — aucun des 3 dispositifs existants n'est pensé pour le
+          soutien entre managers eux-mêmes. <u>Décision</u> : confirmer et prioriser les
+          ateliers de co-dev trimestriels (quick win &lt; 1 mois), sans dépendance aux autres
+          formats.</li>
+      </ol>
+    </div>
+    <p class="fact accent">
+      Action déjà engagée : ce wiki répond à l'action P&amp;D&nbsp;#3 du chantier
+      (« lister et partager les dispositifs d'alerte et de soutien managérial existants ») —
+      à annexer à la charte d'écoute avant validation des formats pilotes.
+    </p>
+
+    <h2 id="incoherences"><span class="n">·</span>Incohérences repérées dans le PPT</h2>
+    <p class="section-sub">
+      Relevé sur le deck <code>Chantiers OHC - dispositif écoute - avec synthese RH.pptx</code>
+      (38 slides), à lever par les porteurs avant d'annexer ce wiki à la charte d'écoute.
+      <span class="tag tag-deduit">DÉDUIT</span>
+    </p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Niv.</th><th>Incohérence</th><th>Où</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="sev sev-major">MAJEURE</span></td>
+            <td><b>Durée du cercle d'écoute</b> — « 30 min par ex » vs « 45 minutes ». Fixer une valeur.</td>
+            <td>slide 2 vs 5</td>
+          </tr>
+          <tr>
+            <td><span class="sev sev-major">MAJEURE</span></td>
+            <td><b>Permanence individuelle</b> — verdict « SUPPRIMER » / « à ne pas recréer », mais conservée « réservée aux sujets de contexte métier ou de mission ». Supprimée ou repositionnée&nbsp;?</td>
+            <td>slides 5 &amp; 38 vs 9</td>
+          </tr>
+          <tr>
+            <td><span class="sev sev-major">MAJEURE</span></td>
+            <td><b>Nombre d'établis</b> — « <b>deux</b> établis Product / Design » vs « <b>trois</b> établis séparés Product, <b>Orga</b> et Design ». Orga apparaît puis disparaît.</td>
+            <td>slide 24 vs 15 &amp; 25</td>
+          </tr>
+          <tr>
+            <td><span class="sev sev-major">MAJEURE</span></td>
+            <td><b>Intercontrat</b> — thématique à part entière (sommaire, retours, reco = 4 commentaires) mais <b>absente du graphe de priorisation</b> (8 thèmes seulement).</td>
+            <td>slide 13 vs 19/34/36</td>
+          </tr>
+          <tr>
+            <td><span class="sev sev-major">MAJEURE</span></td>
+            <td><b>« Café sans solution »</b> — « à réactiver et rendre visible » vs « élaguer (doublon) ». Consignes opposées sur le même atelier.</td>
+            <td>slide 6 vs 38</td>
+          </tr>
+          <tr>
+            <td><span class="sev sev-minor">Mineure</span></td>
+            <td><b>Délai du soutien managérial</b> — « Moyen terme (1-3 mois) » vs « quick win &lt; 1 mois » (ateliers de co-dev).</td>
+            <td>slide 2 vs 10</td>
+          </tr>
+          <tr>
+            <td><span class="sev sev-minor">Mineure</span></td>
+            <td><b>Compétences &amp; parcours</b> — seule des 9 thématiques sans action numérotée dans la liste maîtresse 1→19.</td>
+            <td>slide 31 / matrice 14</td>
+          </tr>
+          <tr>
+            <td><span class="sev sev-minor">Mineure</span></td>
+            <td><b>Mentoring</b> — 1 format « speed dating mentor » vs 2 sous-formats (atelier « Besoin de mentoring » + speed dating).</td>
+            <td>slide 5 vs 8</td>
+          </tr>
+          <tr>
+            <td><span class="sev sev-minor">Mineure</span></td>
+            <td><b>Coquilles</b> — « accompag<b>rn</b>ement » ; « incertitudes<b>stratégiques</b> » (mots collés).</td>
+            <td>slides 21, 25</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <footer class="wiki-footer">
+      Sources : 3 exports Confluence RH (stress, coaching, personne ressource), extraits le
+      2026-07-08/09 ; deck chantier <code>Chantiers OHC - dispositif écoute - avec synthese RH.pptx</code>.
+      Mis en forme le 2026-07-09, mis à jour le 2026-07-10 (ajout du challenge de redondance,
+      resynchro du bloc Zen@octo 2016, relevé des incohérences PPT). Source markdown :
+      <code>docs/wiki/rh-ecoute.md</code>.
+    </footer>
+  </main>
+</div>
