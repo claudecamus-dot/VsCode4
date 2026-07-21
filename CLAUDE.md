@@ -35,6 +35,35 @@ Pas encore un projet de code : seulement de la matière de référence.
 - Pas encore de `.claude/agents/` custom : à créer si le projet en a besoin,
   pas de flotte à dupliquer ici pour l'instant.
 
+## Agents de pilotage — orchestrateur + superviseur (2026-07-21)
+
+Config d'installation reprise du projet frère VSCode2 (`export/README.md` §7 de ce
+dépôt-là), adaptée à l'inventaire réel de VSCode4 (pas de `run-dev-server`, pas d'export
+PPT maison, pas de `.opencode/`, BMAD non trié) :
+
+- Skills `agent-orchestrator` (point d'entrée des demandes multi-étapes/multi-agents,
+  routé par le hook `UserPromptSubmit`) et `agent-supervisor` (diagnostic qualitatif
+  étage 2, sur demande ou signal `SessionStart`) → `.claude/skills/`. Conception :
+  `docs/reflexions/agent-orchestrateur.md` / `agent-superviseur.md` (repris tels quels,
+  précédents/dates = historique VSCode2, à lire comme référence de méthode).
+- `.claude/orchestration/` : `catalogue.md` (adapté — statuts remis à zéro pour ce
+  projet), `playbooks/` (`dev-verifie` adapté — `run-dev-server` → skill `run` générique ;
+  `export-ppt-verifie` et `revue-design-parallele` repris tels quels ; `cycle-produit-bmad`
+  régénéré depuis le CSV BMAD de **ce** projet via `generate_bmad_playbook.py`),
+  `log_run.py`, `git_agents_inventory.py`.
+- `.claude/supervision/` : `scan_transcripts.py` (étage 1, 0 token, lancé par
+  `SessionStart`), `log_usage.py` (`PostToolUse`), `write_diagnostic.py`. Données machine
+  (`state.json`, `usage.jsonl`, `diagnostic.json`, `runs.jsonl`, `routing-hints.json`)
+  gitignorées, démarrent vides — aucun scan/diagnostic n'a encore tourné sur ce projet.
+- 3 hooks ajoutés à `.claude/settings.json` : `SessionStart` (scan superviseur),
+  `UserPromptSubmit` (grille de qualification `orchestrator_gate.py`), `PostToolUse`
+  matcher `Skill|Agent|Task` (journal d'usage). L'allow-list machine de VSCode2 n'a pas
+  été reprise (propre à ce poste-là).
+- Gouvernance : le superviseur *propose* (`diagnostic.json`, champ `proposition`),
+  l'humain *arbitre* (`.claude/supervision/arbitrages.json`, démarre vide — format
+  d'exemple dans `.claude/skills/agent-supervisor/arbitrages.example.json`),
+  l'orchestrateur *applique*.
+
 ## Discipline de gestion des tokens (cf. `Imports/optimisation-tokens.md`)
 
 Le contexte est un cache actif facturé à chaque tour, pas une mémoire

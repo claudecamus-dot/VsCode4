@@ -1,0 +1,29 @@
+{
+  "_doc": "Exemple repris du projet frère VSCode2 (2026-07-21) — illustre le FORMAT attendu par .claude/supervision/arbitrages.json (fichier VERSIONNÉ, édité à la main — le scan le lit, ne l'écrit jamais). cible : nom de skill, ou famille:<Nom> pour une famille entière. Un constat arbitré disparaît des TODO auto mais reste visible dans la section « Arbitrages enregistrés » du tableau de bord ; l'usage réel reste mesuré (un arbitrage n'est pas une preuve d'utilité — le superviseur étage 2 peut le re-challenger avec des données nouvelles). Les entrées ci-dessous sont les décisions RÉELLES de VSCode2 (dates, noms de skills) — à ne PAS recopier telles quelles : ce fichier ne sert que d'exemple de forme. Le vrai .claude/supervision/arbitrages.json de ce projet démarre vide, à remplir au fil des arbitrages réels d'ici.",
+  "arbitrages": [
+    {
+      "cible": "famille:BMAD",
+      "decision": "Tri exécuté : 7 skills retirés, 39 conservés (routage sur demande explicite via bmad-help) — docs/reflexions/tri-skills-bmad.md, commit f604c39.",
+      "date": "2026-07-18",
+      "source": "utilisateur"
+    },
+    {
+      "cible": "pptx-framed-image",
+      "decision": "Conservée malgré zéro invocation — reliée au playbook export-ppt-verifie (étape conditionnelle cadres-photo).",
+      "date": "2026-07-18",
+      "source": "utilisateur"
+    },
+    {
+      "cible": "bmad-code-review",
+      "decision": "Proposition retenue telle quelle : seuil explicite ajouté à revue-increment/SKILL.md (>5 fichiers produit ou logique à risque -> bmad-code-review obligatoire, sinon revue inline) — la délégation implicite ne se déclenchait jamais en pratique.",
+      "date": "2026-07-19",
+      "source": "utilisateur"
+    },
+    {
+      "cible": "revue-design-parallele",
+      "decision": "Proposition du diagnostic retenue et appliquée : garde déterministe ajoutée au contrat de l'étape consolidation (playbook revue-design-parallele) — quand le fan-out sert à une énumération exhaustive AVANT suppression/renommage, un grep -r final de chaque identifiant retiré est obligatoire et prime sur les rapports des sous-agents (extraits, non exhaustifs).",
+      "date": "2026-07-20",
+      "source": "utilisateur"
+    }
+  ]
+}

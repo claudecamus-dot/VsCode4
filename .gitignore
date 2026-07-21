@@ -17,3 +17,11 @@ CLAUDE.local.md
 # BMAD — sorties générées (planning/implementation artifacts), pas du
 # contenu source ; _bmad/ (le moteur) reste versionné à part.
 _bmad-output/
+
+# Superviseur d'agents (étage 1) — données locales de collecte, propres à la
+# machine (offsets de scan, journal temps réel) ; les scripts restent versionnés.
+.claude/supervision/state.json
+.claude/supervision/usage.jsonl
+.claude/supervision/diagnostic.json
+.claude/orchestration/runs.jsonl
+.claude/orchestration/routing-hints.json
