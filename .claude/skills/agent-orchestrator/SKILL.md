@@ -87,9 +87,12 @@ plans (leçons payées du projet — mémoires `feedback_*`) :
 | --- | --- |
 | Template/CSS/JS (UI web) | Screenshot via le skill `run` (pas seulement pytest) |
 | Export PPT (python-pptx) | `pptx-verify` (rendu réel — python-pptx est un parseur tolérant) |
+| **Livrable consommé par l'utilisateur** (deck exporté, écran, doc) | Produire l'**artefact EXACT qu'il ouvre** (la sortie réelle de l'app / du pipeline — **pas** une reconstruction maison), le vérifier/rendre **ENTIER**, et le faire **VALIDER par l'utilisateur** avant tout « fait » (évol 2026-07-22, boucle non convergente : le même modèle validait ce qu'il produisait) |
 | Fin d'incrément / avant commit | `revue-increment` en étape terminale |
 | Exploration volumineuse | Sous-agent `Explore`, jamais la session principale |
 | Skills BMAD | Uniquement sur demande explicite, via `bmad-help` (statut « à trier ») |
+
+**Règle de non-convergence (évol 2026-07-22).** Si le MÊME livrable est rejeté par l'utilisateur **≥ 3 tours** (« toujours KO », « pas traité »), la boucle ne converge pas : **STOP l'itération à l'aveugle** — ne pas re-deviner le défaut. Reproduire l'artefact utilisateur exact (ligne « livrable consommé par l'utilisateur » ci-dessus) ET **demander à l'utilisateur de pointer le défaut précis** (numéro de slide, capture, écran) avant de retoucher quoi que ce soit. L'oracle, c'est l'utilisateur sur SON artefact — pas mon auto-évaluation.
 
 ### 5. Journaliser
 
@@ -100,7 +103,7 @@ py .claude/orchestration/log_run.py '{"demande": "résumé court", "qualificatio
 ```
 
 (JSON aussi accepté sur stdin. `qualification` : `orchestre` | `direct-signale` ;
-`resultat` : `succes` | `partiel` | `echec` ; `playbook` : nom du playbook instancié ou
+`resultat` : `succes` | `en-attente-validation` | `partiel` | `echec` (évol 2026-07-22 : un livrable consommé par l'utilisateur reste `en-attente-validation`, JAMAIS `succes` auto-décerné, tant que l'utilisateur ne l'a pas validé sur l'artefact exact) ; `playbook` : nom du playbook instancié ou
 `null` en composition libre. Les exécutions directes ne se journalisent pas — le journal
 trace les orchestrations, pas la conversation.)
 
