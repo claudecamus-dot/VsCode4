@@ -146,7 +146,12 @@ def main():
               f"slide {num} : divider sur le layout natif 51 (reçu {s.slide_layout.name!r})")
         textes = [sh.text_frame.text.strip() for sh in s.shapes
                   if getattr(sh, "has_text_frame", False)]
-        check(titre in textes, f"slide {num} : titre de chapitre « {titre} »")
+        # Le placeholder titre porte désormais titre + sous-titre italique en
+        # 2ᵉ paragraphe (pattern VSCode2/VSCode3, ajouté 2026-07-23 après
+        # comparaison au rendu réel de VSCode3) — le texte du shape n'est
+        # donc plus exactement le titre seul, mais commence toujours par lui.
+        check(any(t == titre or t.startswith(titre + "\n") for t in textes),
+              f"slide {num} : titre de chapitre « {titre} »")
         check(numero in textes, f"slide {num} : numéro de chapitre « {numero} »")
 
     print("Géométrie (relecture du fichier généré) :")

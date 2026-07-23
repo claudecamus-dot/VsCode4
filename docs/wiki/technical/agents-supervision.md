@@ -9,7 +9,7 @@ generated-by: .claude/supervision/scan_transcripts.py (superviseur d'agents, ét
 > **Ne pas éditer à la main** — toute modification serait écrasée au prochain scan.
 > Conception et phasage : [../../reflexions/agent-superviseur.md](../../reflexions/agent-superviseur.md).
 
-Dernier scan : 2026-07-23T17:26:10+02:00 · **8 sessions** (transcripts) · **12** invocations de skills · **5** lancements de sous-agents.
+Dernier scan : 2026-07-23T17:43:50+02:00 · **8 sessions** (transcripts) · **12** invocations de skills · **5** lancements de sous-agents.
 
 ## Skills — usage réel
 
@@ -64,7 +64,7 @@ _Constats clos par décision humaine (`.claude/supervision/arbitrages.json`) —
 
 ## Diagnostic qualitatif (étage 2 — `agent-supervisor`)
 
-_Diagnostic à jour._
+_Diagnostic ⚠️ à relancer (> 14 j)._
 
 1. **Contournement du cadre photo des dividers de chapitre jamais re-questionné, malgré l'écart documenté au pattern VSCode3 que le dispositif est censé répliquer** — Le sous-agent a vérifié la propreté géométrique et l'ouverture COM des dividers, mais jamais leur fidélité au pattern de référence qu'il était censé reproduire — un contournement (vider le cadre) a été substitué silencieusement à la résolution du problème réel (collision numéro/logo) sans le signaler comme un écart de design à l'utilisateur. · **Proposition** : Ajouter au brief ppt-designer.md (section Design principles) une règle explicite : quand une étape porte une réplication d'un pattern d'un projet frère (VSCode2/VSCode3), le contrat de vérification doit comparer le résultat au comportement RÉEL du pattern source (pas seulement l'auto-check géométrique du propre résultat) — tout écart délibéré (contournement plutôt que résolution) doit être signalé explicitement à l'utilisateur dans le rapport, jamais appliqué en silence. Correctif déjà en cours ce jour (run explicitement demandé par l'utilisateur).
 

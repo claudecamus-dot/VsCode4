@@ -301,7 +301,7 @@ def _neutraliser_fond_cadre(prs):
 
 
 
-def slide_chapitre(prs, numero, titre):
+def slide_chapitre(prs, numero, titre, sous_titre=None):
     """Divider de chapitre — layout natif « 51 - Chapitre [2] ». Reprend
     EXPLICITEMENT la façon dont VSCode2 construit ses intercalaires
     (`app/services/pptx_export.py::_slide_chapitre`, lui-même la version
@@ -316,10 +316,20 @@ def slide_chapitre(prs, numero, titre):
       puce héritée pose marL=0.5in dans un encart de 0.55in de large — d'où
       `D.sans_puce`, marges à zéro, centré, 17pt (taille éprouvée par les
       deux générateurs de référence, jamais un gros numéro en pleine photo).
-    - le TITRE va dans le placeholder idx0 (inchangé).
+    - le TITRE va dans le placeholder idx0, avec un SOUS-TITRE italique gris
+      en 2ᵉ paragraphe du même placeholder — présent dans le rendu RÉEL de
+      VSCode3 (`bmad-iap-cadrage-synthese.pptx`, vérifié à l'œil le
+      2026-07-23, pas seulement dans le code) et dans `_slide_chapitre` de
+      VSCode2 ; absent des deux itérations précédentes de ce fichier (lecture
+      du code seule, sans confronter au rendu réel du fichier de référence).
     - le cadre photo (round2DiagRect) reçoit une VRAIE photo (Openverse CC0,
       clippée à sa forme exacte) plutôt qu'un blob recoloré vidé — ce
       point-là était déjà correct depuis le run précédent.
+    Couleur volontairement NAVY uniforme (pas de couleur par chapitre comme
+    VSCode2/VSCode3) : le deck OHC a délibérément abandonné l'identité
+    couleur par chapitre en v5→v6 (kickers retirés, grammaire native
+    uniforme) — reprendre 4 couleurs ici romprait ce choix déjà arbitré,
+    signalé à l'utilisateur plutôt que décidé en silence.
     Le numéro sur son fond blanc n'a plus AUCUNE dépendance au contraste de
     la photo — l'ancien chiffre 54pt + scrim de protection posé par-dessus le
     cadre photo est donc retiré (il compensait un problème structurel qui
@@ -341,9 +351,11 @@ def slide_chapitre(prs, numero, titre):
     D.appliquer_police(tf_num)
     ph_titre = s.placeholders[0]
     D.definir_geometrie(ph_titre, 5.14, 2.937, 4.554, 1.98)
-    D.definir_paragraphes(ph_titre.text_frame, [
-        ([(titre, dict())], dict()),
-    ])
+    paras_titre = [([(titre, dict())], dict())]
+    if sous_titre:
+        paras_titre.append(([(sous_titre, dict(size=D.TYPE["small"], italic=True,
+                                                color=D.MUTED))], dict(space_before=6)))
+    D.definir_paragraphes(ph_titre.text_frame, paras_titre)
     cadre = D.trouver_cadre_layout(s.slide_layout.shapes, 'round2DiagRect', largeur_min_in=2.0)
     for pb in (frame_obstructions(s, *cadre[:4]) if cadre else []):
         print(f"  [obstruction] chapitre {numero}:", pb["source"], pb["name"], pb["reason"])
@@ -1041,22 +1053,26 @@ def build():
     slide_sommaire(prs, media)
 
     # === Chapitre 01 — Chantier OHC (constat d'enquête + leviers) ===
-    slide_chapitre(prs, "01", "Chantier OHC")
+    slide_chapitre(prs, "01", "Chantier OHC",
+                   "Le levier retenu, les publics concernés, et l'architecture de priorisation.")
     slide_leviers(prs, media)
     slide_personas(prs, media)
     slide_architecture(prs, media)
 
     # === Chapitre 02 — Existant & Évaluation ===
-    slide_chapitre(prs, "02", "Existant & Évaluation")
+    slide_chapitre(prs, "02", "Existant & Évaluation",
+                   "Les 3 dispositifs RH déjà en place, et comment mesurer ce qu'ils ne couvrent pas.")
     slide_existant(prs, media)
     slide_evaluation(prs, media)
 
     # === Chapitre 03 — Nouveautés (le mentorat, seule vraie brique neuve) ===
-    slide_chapitre(prs, "03", "Nouveautés")
+    slide_chapitre(prs, "03", "Nouveautés",
+                   "Le mentorat mission complexe : le seul format sans équivalent existant.")
     slide_mentorat(prs, media)
 
     # === Chapitre 04 — Next steps ===
-    slide_chapitre(prs, "04", "Next steps")
+    slide_chapitre(prs, "04", "Next steps",
+                   "Les arbitrages à trancher, le séquencement, et la feuille de route du pilote.")
     slide_arbitrages(prs, media)
     slide_sequencement(prs, media)
     slide_roadmap(prs, media)
