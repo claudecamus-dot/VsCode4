@@ -1,12 +1,12 @@
 # Playbook `export-ppt-verifie` — travaux sur le deck de restitution, vérifiés au rendu réel
 
-> Repris tel quel du projet frère VSCode2 le 2026-07-21 — précédents et dates ci-dessous
-> appartiennent à l'historique de VSCode2 ; ce playbook n'a pas encore été rejoué dans ce
-> projet. Deux des étapes conditionnelles (`cadres-photo`, `polish-texte`) référencent des
-> skills (`pptx-framed-image`, `slide-text-polish`) **non installées dans ce projet** — cf.
-> `.claude/orchestration/catalogue.md` ; ne pas router vers elles avant leur éventuelle
-> installation. `pptx-deck`, `pptx-verify` et `restitution-deck-design` sont en revanche
-> bien disponibles ici (skills globales).
+> Repris de VSCode2 le 2026-07-21, aligné sur le dispositif VSCode3 le 2026-07-23 :
+> `pptx-framed-image`, `slide-text-polish` et `deck-design-library` sont désormais
+> **installées dans ce projet** (greffe VSCode3, tests rejoués 9/9 et 9/9) et l'étape
+> `generation` s'instancie via le **sous-agent `ppt-designer`** (`.claude/agents/`).
+> `pptx-deck`, `pptx-verify` et `restitution-deck-design` restent des skills globales.
+> Ce playbook a déjà été joué plusieurs fois ici (deck OHC, v2→v6 — cf. mémoire projet
+> `projet-deck-ohc-ecoute`), en génération inline avant la création du sous-agent.
 
 La chaîne PPT complète du projet source, rendue structurelle : produire ou faire évoluer
 le deck de restitution, enrichir si pertinent (cadres photo du template, qualité
@@ -20,6 +20,15 @@ conditionnelles s'appuyaient déjà sur des skills **jamais utilisées à ce jou
 VSCode2 (`pptx-framed-image`, `slide-text-polish`, `restitution-deck-design`) —
 conservées par arbitrage utilisateur là-bas et reliées ici pour exister dans le routage :
 les proposer avec prudence explicite et vérifier leur résultat au rendu.
+
+Routage de l'étape `generation` (aligné sur l'arbitrage VSCode3 du 2026-07-21) : elle
+s'instancie via le **sous-agent `ppt-designer`** (outil `Agent`), pas en génération inline
+dans la session. Modèle hérité du thread principal (pas de bascule : jugement visuel).
+C'est la voie deck unique — `bmad-agent-ux-designer` ne double pas ce rôle. Le brief de
+l'agent porte les règles de sécurité **deck binaire** propres à ce projet (ajouter avant
+de supprimer, purge des rels orphelines, ouverture COM réelle) — ne pas les court-circuiter.
+Une passe de contenu ciblée peut rester inline avec rendu réel, en le notant dans le run
+journalisé.
 
 Frontière avec `dev-verifie` : si la demande est un changement de code générique, c'est
 `dev-verifie` qui s'applique — ce playbook-ci est la version spécialisée quand le
@@ -52,12 +61,12 @@ l'obligation `pptx-verify` et la terminaison `revue-increment`.
     },
     {
       "id": "generation",
-      "agent": "pptx-deck",
+      "agent": "ppt-designer",
       "mode": "cascade",
       "modele": "(session)",
       "contrat": {
         "type": "deterministe",
-        "critere": "export .pptx produit sans exception, auto-check géométrique passé, pytest -k \"pptx or export\" vert (si applicable)"
+        "critere": "instancié via le sous-agent ppt-designer (outil Agent), pas inline ; .pptx sauvé sans exception sur une copie versionnée (jamais l'original Imports/), auto-check géométrique passé, règles deck binaire respectées (ajouter-avant-supprimer, purge rels orphelines), ouverture PowerPoint COM réelle OK (pas de 0x80CB4404)"
       },
       "checkpoint": false
     },
@@ -68,7 +77,7 @@ l'obligation `pptx-verify` et la terminaison `revue-increment`.
       "modele": "(session)",
       "contrat": {
         "type": "deterministe",
-        "critere": "SI le template client porte des cadres photo (prstGeom round2DiagRect, « ici mettre une Photo ») : image insérée épousant la forme exacte du cadre (skill non installée dans ce projet à ce jour — vérifier sa disponibilité avant de router ici, sinon traiter à la main)"
+        "critere": "SI un cadre photo du template est touché (prstGeom round2DiagRect, « ici mettre une Photo ») : image insérée épousant la forme exacte du cadre, chaque image vérifiée par rendu réel avant d'être gardée — sur ce deck, préférer d'abord le média du pptx original (zipfile → ppt/media) aux fetchs externes, pour la cohérence visuelle"
       },
       "checkpoint": false
     },
@@ -79,7 +88,7 @@ l'obligation `pptx-verify` et la terminaison `revue-increment`.
       "modele": "(session)",
       "contrat": {
         "type": "deterministe",
-        "critere": "SI le contenu textuel des slides a été produit ou retouché : lint appliqué sur {title, bullets}, findings bloquants corrigés (skill non installée dans ce projet à ce jour — vérifier sa disponibilité avant de router ici, sinon traiter à la main)"
+        "critere": "SI le contenu textuel des slides a été produit ou retouché : slide_lint passé sur {title, bullets}, findings bloquants corrigés (skill greffée le 2026-07-23, jamais encore jouée sur ce dépôt — contrôler à l'étape verification-rendu)"
       },
       "checkpoint": false
     },
@@ -90,7 +99,7 @@ l'obligation `pptx-verify` et la terminaison `revue-increment`.
       "modele": "(session)",
       "contrat": {
         "type": "reel",
-        "critere": "export réel rendu en images et inspecté visuellement (valeurs alignées, panneaux ni vides ni étirés, pas de collision avec le chrome du template) — jamais retirée à l'instanciation, quelle que soit la taille du changement"
+        "critere": "export réel rendu en images (PowerPoint COM/LibreOffice) et inspecté visuellement, avec un rendu ZOOMÉ sur chaque NOUVEAU type de slide (valeurs alignées, panneaux ni vides ni sur-étirés, ni contenu centré par slot laissant un grand vide sous l'en-tête — défaut « panneau flottant/étiré » récurrent, invisible au self-check géométrique, cf. arbitrage superviseur VSCode3 2026-07-21 ; pas de collision avec le chrome du template) — jamais retirée à l'instanciation, quelle que soit la taille du changement"
       },
       "checkpoint": false
     },

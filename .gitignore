@@ -25,3 +25,9 @@ _bmad-output/
 .claude/supervision/diagnostic.json
 .claude/orchestration/runs.jsonl
 .claude/orchestration/routing-hints.json
+
+# Générateur deck OHC — cache de photos fetchées (Openverse) pour les cadres
+# des dividers de chapitre ; artefact reconstructible (scripts/
+# generate_deck_ohc.py les retélécharge si absents), pas du contenu source.
+# Même convention que VSCode3 (docs/cadrage-ppt/_img/).
+scripts/_img/

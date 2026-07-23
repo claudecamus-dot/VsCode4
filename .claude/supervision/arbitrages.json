@@ -1,0 +1,23 @@
+{
+  "_doc": "Fichier VERSIONNÉ, édité à la main au fil des arbitrages humains sur les diagnostics du superviseur (format : arbitrages.example.json de la skill agent-supervisor). Le scan le lit, ne l'écrit jamais.",
+  "arbitrages": [
+    {
+      "cible": "inline python-pptx",
+      "decision": "Propositions 1+2 du diagnostic 2026-07-23 retenues : module helpers versionné scripts/pptx_deck.py repris de VSCode2 app/services/pptx_deck.py + générateur standalone régénérable du deck OHC (forme VSCode3 generate_deck.py), helpers durcis (find par titre + assert unicité, clear_slides avec drop_rel, ajouter-avant-supprimer), brief ppt-designer amendé pour importer le module.",
+      "date": "2026-07-23",
+      "source": "utilisateur"
+    },
+    {
+      "cible": "pptx-verify",
+      "decision": "Proposition 3 du diagnostic 2026-07-23 retenue : test rendu réel versionné (LibreOffice page-count + assertions qualité adaptées OHC, modèle VSCode3 test_generate_deck.py + VSCode2 test_deck_qualite.py) ; l'ouverture COM PowerPoint reste la vérification finale.",
+      "date": "2026-07-23",
+      "source": "utilisateur"
+    },
+    {
+      "cible": "export-ppt-verifie",
+      "decision": "Proposition 4 du diagnostic 2026-07-23 REPORTÉE : greffe de deck-design-review / priority-matrix (VSCode2) à re-proposer après mise en place du générateur.",
+      "date": "2026-07-23",
+      "source": "utilisateur"
+    }
+  ]
+}

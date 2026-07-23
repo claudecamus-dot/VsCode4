@@ -30,10 +30,9 @@
 | `revue-increment` | Definition-of-done : fin d'incrément, avant commit | Synchrone, étape terminale obligatoire des plans de dev | (session) | Installée, pas encore invoquée dans ce projet |
 | `agent-orchestrator` | Point d'entrée des demandes multi-étapes/multi-agents (routé par le hook UserPromptSubmit) | Synchrone | (session) | Installée à l'instant (ce run) |
 | `agent-supervisor` | Diagnostic qualitatif des agents (étage 2) — depuis `revue-increment` ou sur signal SessionStart | Synchrone, ≤ 1×/14 j | (session) | Installée à l'instant (ce run) — aucun diagnostic encore produit |
-
-> Pas encore de skills projet spécifiques (ex. lancement d'app, export d'un livrable
-> métier) : ce projet est pré-code. Les ajouter ici dès leur création, avec leur
-> déclencheur et le playbook qui les invoque.
+| `pptx-framed-image` | Remplir les cadres photo d'un template PPT (round2DiagRect) — étape conditionnelle du playbook `export-ppt-verifie` | Synchrone | (session) | **used-as-library** — greffée de VSCode3 le 2026-07-23 (tests 9/9) ; code vendored du pipeline deck, restera dans `jamais_utilises` par construction : ne pas retirer au tri |
+| `slide-text-polish` | Lint de la qualité rédactionnelle des slides — étape conditionnelle du playbook `export-ppt-verifie` | Synchrone | (session) | **used-as-library** — greffée de VSCode3 le 2026-07-23 (tests 9/9) ; `slide_lint` intégré au pipeline deck : ne pas retirer au tri |
+| `deck-design-library` | Choisir la FORME d'une slide depuis son INTENTION (22 patterns de soutenance OCTO catalogués par situation) — à consulter avant de dessiner/améliorer une slide du deck | Consultation (référence), en amont de l'étape `generation` d'`export-ppt-verifie` | (session) | **used-as-reference** — greffée de VSCode3 le 2026-07-23 (copie de référence dans VSCode2, resynchroniser manuellement) ; lue comme fichiers : restera dans `jamais_utilises` par construction, ne pas retirer au tri |
 
 ## Skills globaux clés
 
@@ -45,16 +44,18 @@
 | `run` | Lancer/screenshoter l'app pour vérifier un changement UI réel (remplace le `run-dev-server` propre à VSCode2 — équivalent générique, cherche d'abord une skill projet dédiée) | Synchrone | (session) | Disponible |
 | `dataviz`, `skill-creator`, `update-config`, `code-review` / `verify` / `simplify` | Voir description de chaque skill | Synchrone | (session) | Builtins/globaux disponibles |
 
-> `pptx-framed-image` et `slide-text-polish` (enrichissements PPT conditionnels du
-> playbook `export-ppt-verifie` sur VSCode2) **ne sont pas installées dans ce projet** —
-> le playbook les référence quand même (repris tel quel, cf. sa note de provenance) mais
-> l'orchestrateur ne doit **pas** router vers elles tant qu'elles ne sont pas ajoutées ici ;
-> traiter l'étape correspondante comme non applicable jusqu'à leur éventuelle installation.
+> Le dispositif PPT complet de VSCode3 (sous-agent `ppt-designer` + skills
+> `pptx-framed-image` / `slide-text-polish` / `deck-design-library`) a été greffé le
+> 2026-07-23 — les étapes conditionnelles d'`export-ppt-verifie` sont désormais toutes
+> routables. Adaptation locale : le deck de ce projet est un **binaire versionné**
+> (`Exports/`), pas un deck régénéré par script — le brief de `ppt-designer` porte les
+> règles de sécurité correspondantes (ajouter-avant-supprimer, purge rels, ouverture COM).
 
 ## Sous-agents (seuls à accepter un choix de modèle)
 
 | Sous-agent | Quand l'utiliser | Mode typique | Modèle conseillé | Statut |
 | --- | --- | --- | --- | --- |
+| `ppt-designer` | Voie deck unique : étape `generation` d'`export-ppt-verifie` (créer/améliorer des slides du deck OHC, `Exports/`) — `bmad-agent-ux-designer` ne double pas ce rôle | Synchrone (outil `Agent`) | Hérite du thread principal — pas de bascule (jugement visuel, cf. arbitrage VSCode3) | Créé le 2026-07-23 (adapté de VSCode3 au deck binaire), jamais encore invoqué ici |
 | `Explore` | Recherche large en lecture seule, conclusion sans les dumps | Parallèle (fan-out ≤4) ou async | Haiku/Sonnet (mécanique/standard) | Disponible |
 | `Plan` | Concevoir une stratégie d'implémentation | Synchrone | Opus/Fable (structurant) | Disponible |
 | `general-purpose` | Tâche multi-étapes déléguée, sortie volumineuse | Async ou synchrone | Sonnet ; Opus/Fable si structurant | Disponible |
@@ -85,6 +86,6 @@ composer à vide. Format : `.claude/orchestration/playbooks/FORMAT.md`.
 | Playbook | Quand | Source | Statut |
 | --- | --- | --- | --- |
 | `dev-verifie` | Dev/correction : tests + vérif réelle (conditionnelle aux fichiers touchés) + `revue-increment` avant commit | Manuel (repris de VSCode2, adapté : `run-dev-server` → `run`) | Repris, jamais rejoué dans ce projet |
-| `export-ppt-verifie` | Livrable = le deck : génération (`pptx-deck`) + enrichissements conditionnels + `pptx-verify` obligatoire + `revue-increment` | Manuel (repris tel quel de VSCode2) | Repris, jamais rejoué dans ce projet — 2 des 3 étapes conditionnelles référencent des skills non installées ici (voir note ci-dessus) |
+| `export-ppt-verifie` | Livrable = le deck : génération (sous-agent `ppt-designer` + skills `pptx-deck`…) + enrichissements conditionnels + `pptx-verify` obligatoire + `revue-increment` | Manuel (repris de VSCode2, aligné VSCode3 le 2026-07-23 : génération via sous-agent, étapes conditionnelles toutes routables) | Éprouvé ici — joué plusieurs fois sur le deck OHC (v3→v6, cf. mémoire `projet-deck-ohc-ecoute`), en inline avant la création du sous-agent |
 | `revue-design-parallele` | Revue multi-angles en fan-out d'`Explore` (≤4) puis consolidation | Manuel (repris tel quel de VSCode2) | Repris, jamais rejoué dans ce projet |
 | `cycle-produit-bmad` | Cycle produit BMAD (brief→PRD→archi→epics→dev→review), clos par `revue-increment` | `generate_bmad_playbook.py` (régénéré depuis le CSV BMAD de **ce** projet) | Jamais joué — sur demande explicite |

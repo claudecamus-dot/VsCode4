@@ -32,8 +32,58 @@ Pas encore un projet de code : seulement de la matière de référence.
   `revue-increment` (definition-of-done avant commit, délègue à
   `bmad-code-review`/`bmad-retrospective`) posés **avant** le premier code,
   en parité avec les projets frères VSCode/VSCode1/VSCode2/VSCode3.
-- Pas encore de `.claude/agents/` custom : à créer si le projet en a besoin,
-  pas de flotte à dupliquer ici pour l'instant.
+- ~~Pas encore de `.claude/agents/` custom~~ → voir « Dispositif PPT »
+  ci-dessous (2026-07-23).
+
+## Dispositif PPT — sous-agent + skills (greffe VSCode3, 2026-07-23)
+
+Réplication du dispositif deck de VSCode3, adaptée au deck **binaire** de ce
+projet (deck OHC « dispositif d'écoute », copies versionnées dans `Exports/` —
+cf. mémoire `projet-deck-ohc-ecoute`) :
+
+- `.claude/agents/ppt-designer.md` : sous-agent pilote de l'étape `generation`
+  du playbook `export-ppt-verifie` (voie deck unique — `bmad-agent-ux-designer`
+  ne double pas ce rôle). Pas de champ `model:` (hérite du thread principal —
+  jugement visuel, délibéré, cf. arbitrage VSCode3). Son brief porte les règles
+  de sécurité deck binaire : ajouter-avant-supprimer, purge des rels
+  orphelines, ouverture PowerPoint COM réelle après chaque save.
+- `.claude/skills/` greffées de VSCode3 (tests rejoués après copie : 9/9 et
+  9/9) : `pptx-framed-image` (cadres photo du template, used-as-library),
+  `slide-text-polish` (lint rédactionnel des slides, used-as-library),
+  `deck-design-library` (22 patterns de soutenance OCTO par situation,
+  used-as-reference — copie de référence dans VSCode2, resynchroniser
+  manuellement). Complètent les skills globales `pptx-deck` / `pptx-verify` /
+  `restitution-deck-design`.
+- Playbook `export-ppt-verifie` et `catalogue.md` alignés en conséquence
+  (génération via sous-agent, étapes conditionnelles toutes routables).
+
+## Générateur PPT versionné (arbitrage superviseur, 2026-07-23)
+
+Le deck OHC était produit par édition in-place via scripts jetables en scratchpad
+(pièges pptx rejoués d'un run à l'autre — cf. mémoire
+`feedback-suppression-slide-pptx-orphelins`). Diagnostic `agent-supervisor` du
+2026-07-23 (`.claude/supervision/diagnostic.json`) + arbitrage utilisateur
+(`.claude/supervision/arbitrages.json`) : consolidation d'un outillage versionné,
+inspiré des dépôts frères VSCode2 (module helpers) et VSCode3 (forme du
+générateur standalone) :
+
+- `scripts/pptx_deck.py` : bibliothèque helpers python-pptx (échelle typo,
+  cartes/chips/badges/encarts, double self-check `verifier_geometrie` +
+  `verifier_debordements_texte`), reprise de VSCode2 `app/services/pptx_deck.py`
+  et complétée d'une section « helpers durcis deck binaire » —
+  `trouver_slide_par_titre` (égalité stricte + assertion d'unicité),
+  `supprimer_slide`/`clear_slides` (avec `drop_rel`),
+  `purger_rels_slides_orphelines`. **Module unique de référence : à importer,
+  jamais à redéfinir inline** (le brief `ppt-designer` l'impose).
+- `scripts/generate_deck_ohc.py` : générateur standalone (forme VSCode3
+  `generate_deck.py` : `slide_*` par slide, `build()`, self-check bloquant) qui
+  régénère le deck OHC (15 slides, contenu cartographié sur la v6) en réutilisant
+  les layouts natifs du template OCTO. Source = `Exports/… - v6.pptx` (masters/
+  layouts/thème/média), jamais modifiée. Sortie : `Exports/… - v7-genere.pptx`.
+  Usage : `py scripts/generate_deck_ohc.py`.
+- `scripts/test_generate_deck_ohc.py` : 40 assertions (structure, géométrie,
+  qualité, rendu réel LibreOffice avec skip propre si absent). Usage :
+  `py scripts/test_generate_deck_ohc.py`.
 
 ## Agents de pilotage — orchestrateur + superviseur (2026-07-21)
 
