@@ -202,11 +202,13 @@ def main():
 
     # Dividers : chacun porte une vraie photo dans son cadre (pattern VSCode3,
     # 2026-07-23) — plus le blob navy vidé de la version précédente. La photo
-    # doit occuper EXACTEMENT les bornes du cadre du layout (round2DiagRect,
-    # largeur >= 2in — cf. D.trouver_cadre_layout) : un simple compte d'image
-    # ne détecterait pas une photo mal cadrée (mauvaise taille/position).
+    # doit occuper EXACTEMENT les bornes du cadre du layout (teardrop
+    # adj=100000 — quasi-cercle repris à l'identique de VSCode3, demandé
+    # explicitement par l'utilisateur à la place du round2DiagRect d'origine
+    # — largeur >= 2in, cf. D.trouver_cadre_layout) : un simple compte
+    # d'image ne détecterait pas une photo mal cadrée (mauvaise taille/position).
     cadre_layout = D.trouver_cadre_layout(
-        gen._layout(prs, "51 - Chapitre [2]").shapes, "round2DiagRect", largeur_min_in=2.0)
+        gen._layout(prs, "51 - Chapitre [2]").shapes, "teardrop", largeur_min_in=2.0)
     check(cadre_layout is not None, "cadre photo du layout Chapitre retrouvé")
     for num, attendu in IMAGES_DIVIDERS.items():
         s = prs.slides[num - 1]
@@ -221,8 +223,12 @@ def main():
                   f"(reçu l={pic.left} t={pic.top} w={pic.width} h={pic.height} ; "
                   f"attendu l={cl} t={ct} w={cw} h={ch})")
             geom = pic._element.spPr.find(qn("a:prstGeom"))
-            check(geom is not None and geom.get("prst") == "round2DiagRect",
-                  f"slide {num} : photo clippée au prstGeom du cadre (round2DiagRect)")
+            check(geom is not None and geom.get("prst") == "teardrop",
+                  f"slide {num} : photo clippée au prstGeom du cadre (teardrop)")
+            adj = geom.find(qn("a:avLst") + "/" + qn("a:gd")) if geom is not None else None
+            check(adj is not None and adj.get("fmla") == "val 100000",
+                  f"slide {num} : teardrop adj=100000 (quasi-cercle, reçu "
+                  f"{adj.get('fmla') if adj is not None else None!r})")
 
     # Numéro de chapitre dans le placeholder natif idx1 (2026-07-23, reprise
     # explicite du pattern VSCode2/VSCode3) : la pastille-pilule du template

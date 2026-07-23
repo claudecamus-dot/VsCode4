@@ -351,6 +351,23 @@ def _repositionner_layout_chapitre(prs):
         l, t, w, h = _CIBLE_PHOTO
         cadre_sh.left, cadre_sh.top = Inches(l), Inches(t)
         cadre_sh.width, cadre_sh.height = Inches(w), Inches(h)
+        # Forme de découpe : teardrop adj=100000 (quasi-cercle, PAS de pointe
+        # visible à ce réglage) — reprise à l'identique du prstGeom réel de
+        # VSCode3 (shape 36 du layout « 50 - Chapitre [1] »), demandée
+        # explicitement par l'utilisateur à la place du round2DiagRect
+        # (grammaire de cadre du reste du deck OHC, gardée jusqu'ici par
+        # défaut — écart désormais tranché par l'utilisateur en faveur de
+        # VSCode3 pour CES 4 slides précisément).
+        spPr = cadre_sh._element.spPr
+        ancien = spPr.find(qn("a:prstGeom"))
+        if ancien is not None:
+            nouveau = spPr.makeelement(qn("a:prstGeom"), {"prst": "teardrop"})
+            av_lst = nouveau.makeelement(qn("a:avLst"), {})
+            gd = av_lst.makeelement(qn("a:gd"), {"name": "adj", "fmla": "val 100000"})
+            av_lst.append(gd)
+            nouveau.append(av_lst)
+            ancien.addprevious(nouveau)  # meme position dans l'ordre du schema
+            spPr.remove(ancien)
 
 
 def slide_chapitre(prs, numero, titre, sous_titre=None):
@@ -401,7 +418,7 @@ def slide_chapitre(prs, numero, titre, sous_titre=None):
         paras_titre.append(([(sous_titre, dict(size=D.TYPE["small"], italic=True,
                                                 color=D.MUTED))], dict(space_before=6)))
     D.definir_paragraphes(ph_titre.text_frame, paras_titre)
-    cadre = D.trouver_cadre_layout(s.slide_layout.shapes, 'round2DiagRect', largeur_min_in=2.0)
+    cadre = D.trouver_cadre_layout(s.slide_layout.shapes, 'teardrop', largeur_min_in=2.0)
     for pb in (frame_obstructions(s, *cadre[:4]) if cadre else []):
         print(f"  [obstruction] chapitre {numero}:", pb["source"], pb["name"], pb["reason"])
     requete, seed = _SCENES_CHAPITRE[numero]
