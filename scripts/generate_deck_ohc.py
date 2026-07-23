@@ -300,43 +300,88 @@ def _neutraliser_fond_cadre(prs):
     geom_el.addnext(no_fill)
 
 
+# Repositionnement du layout Chapitre (2026-07-23, 4e itération) — taille et
+# position de la photo + du badge numéro mesurées EXACTEMENT sur la slide 4
+# réelle de VSCode3 (bmad-iap-cadrage-synthese.pptx, layout « 50 - Chapitre
+# [1] », lue programmatiquement, pas estimée à l'œil) : les deux templates
+# font la MÊME taille de slide (10 x 5.625in), donc les coordonnées absolues
+# se portent telles quelles, sans mise à l'échelle.
+#
+# Constat qui a motivé ce repositionnement (le rendu réel de VSCode4 restait
+# KO après l'ajout du sous-titre) : le cadre photo natif du template OCTO de
+# VSCode4 occupe presque toute la colonne gauche (4.01 x 4.17in, flush en
+# haut/à gauche) et le badge numéro vit dans le coin supérieur gauche de la
+# slide, DÉCONNECTÉ de la photo — alors que sur VSCode3, la photo est plus
+# petite (2.80 x 2.80in) et le badge numéro est directement ACCROCHÉ
+# au-dessus d'elle. Les DEUX gabarits partagent la même famille de composants
+# (mêmes tailles exactes de badge/logo — même lignée de template OCTO,
+# export Google Slides — seule la position absolue diffère), donc chaque
+# forme du badge est repositionnée à la position mesurée de son équivalent
+# VSCode3 (pas une simple translation globale : l'ordre gauche/droite
+# numéro/logo est inversé entre les deux templates, cf. mémoire projet).
+_CIBLE_LAYOUT_CHAPITRE = {
+    # nom de forme (layout VSCode4) : (left, top) en pouces — largeur/hauteur
+    # de CHAQUE forme restent les siennes (déjà identiques à VSCode3, vérifié)
+    "Google Shape;201;p40": (3.781, 1.341),  # fond de pastille du numéro (≡ VSCode3 shape 37)
+    "Google Shape;187;p40": (3.297, 1.331),  # volet logo « O » (≡ VSCode3 shape 54)
+    "Google Shape;202;p40": (3.469, 1.487),  # icône « O » groupée (≡ VSCode3 shape 39)
+}
+_CIBLE_PHOTO = (1.528, 1.815, 2.800, 2.800)  # l, t, w, h — ≡ VSCode3 Picture 3
+_CIBLE_NUMERO = (3.781, 1.341, 0.546, 0.474)  # ≡ placeholder idx1 VSCode3
+_CIBLE_TITRE = (4.698, 2.098, 4.554, 1.980)  # ≡ placeholder idx0 VSCode3
+
+
+def _repositionner_layout_chapitre(prs):
+    """Déplace UNE FOIS (layout partagé par les 4 dividers) les formes de
+    décor du badge numéro/logo et redimensionne/repositionne le cadre photo,
+    pour que taille ET position matchent la slide 4 réelle de VSCode3 (cf.
+    constat ci-dessus). Les formes de décor ne sont PAS des placeholders :
+    python-pptx ne permet de les modifier qu'au niveau du layout (pas de
+    surcharge par slide pour une AUTO_SHAPE/GROUP héritée)."""
+    layout = _layout(prs, '51 - Chapitre [2]')
+    par_nom = {sh.name: sh for sh in layout.shapes}
+    for nom, (l, t) in _CIBLE_LAYOUT_CHAPITRE.items():
+        sh = par_nom.get(nom)
+        if sh is None:
+            print(f"  [repositionnement] forme {nom!r} introuvable dans le layout")
+            continue
+        sh.left, sh.top = Inches(l), Inches(t)
+    cadre_sh = par_nom.get("Google Shape;188;p40")
+    if cadre_sh is not None:
+        l, t, w, h = _CIBLE_PHOTO
+        cadre_sh.left, cadre_sh.top = Inches(l), Inches(t)
+        cadre_sh.width, cadre_sh.height = Inches(w), Inches(h)
+
 
 def slide_chapitre(prs, numero, titre, sous_titre=None):
     """Divider de chapitre — layout natif « 51 - Chapitre [2] ». Reprend
-    EXPLICITEMENT la façon dont VSCode2 construit ses intercalaires
-    (`app/services/pptx_export.py::_slide_chapitre`, lui-même la version
-    éprouvée — P3 — du pattern du générateur de référence VSCode3) :
-    - le NUMÉRO va dans le placeholder natif idx1 du layout (pas un chiffre
-      dessiné en gros par-dessus la photo) : c'est la pastille-pilule
-      top-gauche du template (contour navy, fond blanc — vérifié
-      programmatiquement, shapes 187/201 du layout, `fill.type = NoFill`),
-      DISTINCTE de la pastille logo du master (aucune collision réelle :
-      logo en (0.30–0.49, 0.32–0.50)in, encart numéro en (0.92–1.47,
-      0.41–0.88)in). Le seul piège réel (VSCode2/VSCode3) est le WRAP : la
+    EXPLICITEMENT la façon dont VSCode2/VSCode3 construisent leurs
+    intercalaires, jusqu'à la géométrie mesurée sur la slide 4 RÉELLE de
+    VSCode3 (`bmad-iap-cadrage-synthese.pptx`, cf. `_CIBLE_*` et
+    `_repositionner_layout_chapitre` ci-dessus — appelée une fois dans
+    `build()`, layout partagé par les 4 dividers) :
+    - le NUMÉRO va dans le placeholder natif idx1 du layout, repositionné
+      pour venir se coller AU-DESSUS de la photo (pas dans le coin supérieur
+      gauche de la slide, déconnecté d'elle — c'était encore le cas à
+      l'itération précédente, qui n'avait matché que la TAILLE du badge, pas
+      sa POSITION relative à la photo). Piège WRAP (VSCode2/VSCode3) : la
       puce héritée pose marL=0.5in dans un encart de 0.55in de large — d'où
-      `D.sans_puce`, marges à zéro, centré, 17pt (taille éprouvée par les
-      deux générateurs de référence, jamais un gros numéro en pleine photo).
-    - le TITRE va dans le placeholder idx0, avec un SOUS-TITRE italique gris
-      en 2ᵉ paragraphe du même placeholder — présent dans le rendu RÉEL de
-      VSCode3 (`bmad-iap-cadrage-synthese.pptx`, vérifié à l'œil le
-      2026-07-23, pas seulement dans le code) et dans `_slide_chapitre` de
-      VSCode2 ; absent des deux itérations précédentes de ce fichier (lecture
-      du code seule, sans confronter au rendu réel du fichier de référence).
-    - le cadre photo (round2DiagRect) reçoit une VRAIE photo (Openverse CC0,
-      clippée à sa forme exacte) plutôt qu'un blob recoloré vidé — ce
-      point-là était déjà correct depuis le run précédent.
+      `D.sans_puce`, marges à zéro, centré, 17pt.
+    - le TITRE va dans le placeholder idx0, repositionné en conséquence
+      (juste à droite de la photo repositionnée), avec un SOUS-TITRE
+      italique gris en 2ᵉ paragraphe.
+    - le cadre photo (round2DiagRect) est plus PETIT et repositionné
+      (2.80×2.80in au lieu de 4.01×4.17in flush en haut-à-gauche) —
+      `D.trouver_cadre_layout` relit la géométrie du layout à chaque appel,
+      donc suit automatiquement le repositionnement fait une fois en amont.
     Couleur volontairement NAVY uniforme (pas de couleur par chapitre comme
     VSCode2/VSCode3) : le deck OHC a délibérément abandonné l'identité
     couleur par chapitre en v5→v6 (kickers retirés, grammaire native
     uniforme) — reprendre 4 couleurs ici romprait ce choix déjà arbitré,
-    signalé à l'utilisateur plutôt que décidé en silence.
-    Le numéro sur son fond blanc n'a plus AUCUNE dépendance au contraste de
-    la photo — l'ancien chiffre 54pt + scrim de protection posé par-dessus le
-    cadre photo est donc retiré (il compensait un problème structurel qui
-    disparaît avec le bon placeholder, pas un correctif à garder en plus)."""
+    signalé à l'utilisateur plutôt que décidé en silence."""
     s = _nouvelle_slide(prs, '51 - Chapitre [2]', garder={0, 1})
     ph_num = s.placeholders[1]
-    D.definir_geometrie(ph_num, 0.92, 0.41, 0.546, 0.474)
+    D.definir_geometrie(ph_num, *_CIBLE_NUMERO)
     tf_num = ph_num.text_frame
     tf_num.text = numero
     tf_num.margin_left = tf_num.margin_right = tf_num.margin_top = tf_num.margin_bottom = 0
@@ -350,7 +395,7 @@ def slide_chapitre(prs, numero, titre, sous_titre=None):
             r.font.color.rgb = D.rgb(NAVY)
     D.appliquer_police(tf_num)
     ph_titre = s.placeholders[0]
-    D.definir_geometrie(ph_titre, 5.14, 2.937, 4.554, 1.98)
+    D.definir_geometrie(ph_titre, *_CIBLE_TITRE)
     paras_titre = [([(titre, dict())], dict())]
     if sous_titre:
         paras_titre.append(([(sous_titre, dict(size=D.TYPE["small"], italic=True,
@@ -1048,6 +1093,7 @@ def build():
     prs = Presentation(SOURCE_V6)
     D.clear_slides(prs)
     _neutraliser_fond_cadre(prs)
+    _repositionner_layout_chapitre(prs)
 
     slide_couverture(prs, media)
     slide_sommaire(prs, media)
