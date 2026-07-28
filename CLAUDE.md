@@ -84,6 +84,10 @@ générateur standalone) :
 - `scripts/test_generate_deck_ohc.py` : 40 assertions (structure, géométrie,
   qualité, rendu réel LibreOffice avec skip propre si absent). Usage :
   `py scripts/test_generate_deck_ohc.py`.
+- Linter : `py -m ruff check .` (config `pyproject.toml`, baseline F/I/UP/B).
+  Première mesure 2026-07-28 : 8 points, aucun seuil imposé — on mesure d'abord.
+  **Jamais `--fix` en aveugle** : sur VSCode2 un `--fix` a supprimé un ré-export et
+  cassé un import ; corriger au fil de l'eau puis rejouer le test du générateur.
 
 ## Agents de pilotage — orchestrateur + superviseur (2026-07-21)
 

@@ -1,0 +1,14 @@
+# Configuration ruff — 2026-07-28, finding pratique-dev du superviseur de flotte.
+# Le périmètre d'exclusion « VSCode4 = peu de code » de l'arbitrage du 2026-07-23
+# était démenti par la mesure : scripts/generate_deck_ohc.py (~2100 lignes) plus
+# scripts/pptx_deck.py (930 lignes, fork local). Baseline alignée sur celle du hub
+# et de VSCode2 : on MESURE d'abord, aucun seuil imposé, et surtout pas de
+# `ruff --fix` aveugle (un --fix a cassé un ré-export sur VSCode2 le 2026-07-23).
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-exclude = [".claude/skills", "_bmad", "_bmad-output"]
+
+[tool.ruff.lint]
+# F = pyflakes (vrais bugs)  ·  I = imports  ·  UP = modernisations  ·  B = bugbear
+select = ["F", "I", "UP", "B"]
