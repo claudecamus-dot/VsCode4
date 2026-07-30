@@ -88,6 +88,14 @@ générateur standalone) :
   Première mesure 2026-07-28 : 8 points, aucun seuil imposé — on mesure d'abord.
   **Jamais `--fix` en aveugle** : sur VSCode2 un `--fix` a supprimé un ré-export et
   cassé un import ; corriger au fil de l'eau puis rejouer le test du générateur.
+- Couverture (`requirements-dev.txt` : `coverage` épinglé) — `test_generate_deck_ohc.py`
+  est un script autonome (pas des `def test_*` pytest), donc `coverage run`, PAS
+  `pytest-cov` (finding VSCode3+VSCode4:exclusion-tests-perimee, l'exclusion « peu de
+  code » du 2026-07-23 était déjà démentie côté linter par la mesure du 2026-07-28) :
+  `py -m coverage run --source=scripts scripts/test_generate_deck_ohc.py && py -m coverage report`.
+  PREMIÈRE MESURE 2026-07-30 : 75 % (generate_deck_ohc.py 96 %, pptx_deck.py 48 % — le
+  fork local n'est exercé que par les chemins que le deck OHC emprunte réellement).
+  Aucun seuil imposé.
 
 ## Agents de pilotage — orchestrateur + superviseur (2026-07-21)
 

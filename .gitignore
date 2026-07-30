@@ -8,6 +8,10 @@ __pycache__/
 .env
 .DS_Store
 
+# Artefact de mesure coverage (py -m coverage run --source=scripts ...) -
+# regenere a chaque run, jamais du contenu source.
+.coverage
+
 # Claude Code — réglages/notes propres à une machine ou une personne (jamais
 # partagés), à distinguer de .claude/settings.json et .claude/skills|hooks|
 # agents/ qui eux restent versionnés pour toute l'équipe.
