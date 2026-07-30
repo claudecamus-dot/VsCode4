@@ -82,14 +82,31 @@ MEDIA_UTILISES = {"image4.png", "image5.png", "image13.png", "image15.png",
                   "image19.png"}
 
 
+def _exiger_source(chemin):
+    """Garde explicite avant tout chargement du template v6 — un fichier
+    absent levait un crash brut (FileNotFoundError/BadZipFile peu clair, cf.
+    finding robustesse de l'audit 2026-07-23 : « crashs durs non gardés sur
+    template/média absents »). SystemExit nommant le fichier attendu."""
+    if not os.path.isfile(chemin):
+        raise SystemExit(
+            f"generate_deck_ohc : template source introuvable -> {chemin}\n"
+            "Attendu : le fichier v6 archivé sous Exports/ (jamais régénéré).")
+
+
 def charger_media(chemin):
     """Extrait de la v6 (zipfile) les blobs d'images réutilisés par les
     slides — clef = nom de fichier média (image5.png…)."""
     with zipfile.ZipFile(chemin) as z:
-        return {nom.rsplit("/", 1)[-1]: z.read(nom)
-                for nom in z.namelist()
-                if nom.startswith("ppt/media/")
-                and nom.rsplit("/", 1)[-1] in MEDIA_UTILISES}
+        trouves = {nom.rsplit("/", 1)[-1]: z.read(nom)
+                   for nom in z.namelist()
+                   if nom.startswith("ppt/media/")
+                   and nom.rsplit("/", 1)[-1] in MEDIA_UTILISES}
+    manquants = MEDIA_UTILISES - trouves.keys()
+    if manquants:
+        raise SystemExit(
+            f"generate_deck_ohc : média(s) manquant(s) dans {chemin} -> "
+            f"{sorted(manquants)} (attendus : {sorted(MEDIA_UTILISES)})")
+    return trouves
 
 
 def _layout(prs, nom):
@@ -1106,6 +1123,7 @@ def build():
     texte) puis purge des relations de slide orphelines avant save — règles
     deck binaire (cf. pptx_deck, section helpers durcis). Renvoie la liste
     des problèmes (vide = OK)."""
+    _exiger_source(SOURCE_V6)
     media = charger_media(SOURCE_V6)
     prs = Presentation(SOURCE_V6)
     D.clear_slides(prs)

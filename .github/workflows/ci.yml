@@ -1,0 +1,40 @@
+name: CI
+
+# Introduite le 2026-07-30 (finding pratique-dev du superviseur de flotte :
+# l'exclusion "peu de code" du 2026-07-23 était déjà démentie par la mesure
+# du 2026-07-28 pour ce même projet, sans jamais avoir été réappliquée à la CI).
+#
+# Portée volontairement LIMITÉE au lint : Exports/ (le deck OHC source et ses
+# versions v2-v6, ~25 Mo, contenu RH interne réel) n'est PAS versionné —
+# décision antérieure à cette CI, hors périmètre ici. test_generate_deck_ohc.py
+# a donc besoin d'un fichier absent d'un clone frais ; l'exécuter ici échouerait
+# systématiquement sur un blocage sans rapport avec la qualité du code. La
+# vérification réelle (build + rendu PowerPoint/LibreOffice) reste une étape
+# de SESSION, sur le poste qui a le fichier source — voir CLAUDE.md.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+
+      # Informatif (pas un gate) : baseline mesurée 2026-07-28 = 8 points
+      # (5 I001, 2 UP009, 1 F541), jamais corrigés par --fix aveugle (leçon
+      # VSCode2 2026-07-23 : un --fix a supprimé un ré-export et cassé un
+      # import). Même politique que le reste de la flotte : on mesure la
+      # dérive, on ne bloque pas dessus.
+      - name: Lint (ruff, informatif)
+        run: python -m ruff check . || true

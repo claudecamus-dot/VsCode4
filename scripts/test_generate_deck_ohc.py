@@ -30,6 +30,7 @@ import re
 import subprocess
 import sys
 import tempfile
+import zipfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
@@ -264,6 +265,23 @@ def main():
             print(f"  SKIP {detail}")
         else:
             check(ok, detail)
+
+    print("Garde template/média (finding robustesse 2026-07-23, corrigé 2026-07-30) :")
+    try:
+        gen._exiger_source(os.path.join(HERE, "n-existe-pas.pptx"))
+        check(False, "_exiger_source aurait dû lever SystemExit sur un chemin absent")
+    except SystemExit as e:
+        check("n-existe-pas.pptx" in str(e),
+              f"_exiger_source nomme le fichier attendu (reçu : {e!r})")
+    with tempfile.TemporaryDirectory(prefix="test-deck-ohc-media-") as tmp:
+        zip_vide = os.path.join(tmp, "vide.pptx")
+        with zipfile.ZipFile(zip_vide, "w") as z:
+            z.writestr("ppt/media/inconnu.png", b"")
+        try:
+            gen.charger_media(zip_vide)
+            check(False, "charger_media aurait dû lever SystemExit sur des médias manquants")
+        except SystemExit as e:
+            check("image4.png" in str(e), f"charger_media nomme les médias manquants (reçu : {e!r})")
 
     print("\nTOUS LES TESTS PASSENT" if echecs == 0 else f"\n{echecs} TEST(S) EN ECHEC")
     sys.exit(0 if echecs == 0 else 1)

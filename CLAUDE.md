@@ -81,9 +81,12 @@ générateur standalone) :
   les layouts natifs du template OCTO. Source = `Exports/… - v6.pptx` (masters/
   layouts/thème/média), jamais modifiée. Sortie : `Exports/… - v7-genere.pptx`.
   Usage : `py scripts/generate_deck_ohc.py`.
-- `scripts/test_generate_deck_ohc.py` : 40 assertions (structure, géométrie,
-  qualité, rendu réel LibreOffice avec skip propre si absent). Usage :
-  `py scripts/test_generate_deck_ohc.py`.
+- `scripts/test_generate_deck_ohc.py` : 42 assertions (structure, géométrie,
+  qualité, rendu réel LibreOffice avec skip propre si absent, garde
+  template/média ajoutée 2026-07-30). Usage : `py scripts/test_generate_deck_ohc.py`.
+- CI (`.github/workflows/ci.yml`, ajoutée 2026-07-30) : lint uniquement,
+  informatif — voir le commentaire du workflow pour pourquoi le test de
+  génération réel n'y tourne pas (`Exports/` non versionné, contenu RH réel).
 - Linter : `py -m ruff check .` (config `pyproject.toml`, baseline F/I/UP/B).
   Première mesure 2026-07-28 : 8 points, aucun seuil imposé — on mesure d'abord.
   **Jamais `--fix` en aveugle** : sur VSCode2 un `--fix` a supprimé un ré-export et
